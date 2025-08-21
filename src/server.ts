@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 import { Server } from "http";
-import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 import app from "./app";
 import dotenv from "dotenv"
+import { envVars } from "./app/config/env";
 
 dotenv.config()
 
@@ -12,15 +13,13 @@ let server: Server;
 
 const startServer = async () => {
     try {
-        if (!process.env.DB_URL) {
-            throw new Error("❌ DB_URL is not defined in .env");
-        }
-        await mongoose.connect(process.env.DB_URL)
+       
+        await mongoose.connect(envVars.DB_URL)
 
         console.log("Connected to DB");
 
-        server = app.listen(5000, () => {
-            console.log("Ride Booking Server is listening to port 5000");
+        server = app.listen(envVars.PORT, () => {
+            console.log(`Ride Booking Server is listening to port ${envVars.PORT}`);
         })
     } catch (error) {
         console.log(error);
@@ -32,9 +31,11 @@ startServer();
 //unhandled rejection error, to prevent server crash/ gracefully shutdown
 process.on("unhandledRejection", (err)=>{
     console.log("Unhandled Rejection detected ... Server is shutting down", err);
-    server.close(()=>{
-
+    if(server){
+        server.close(()=>{
+            process.exit(1)
     })
+    }
     process.exit(1)
 })
 
@@ -43,9 +44,11 @@ process.on("unhandledRejection", (err)=>{
 //uncaught rejection error // not connected with promise // some local problem, unknown var, other symbol
 process.on("uncaughtException", (err)=>{
     console.log("Uncaught Exception detected ... Server is shutting down", err);
-    server.close(()=>{
-
+     if(server){
+        server.close(()=>{
+            process.exit(1)
     })
+    }
     process.exit(1)
 })
 
@@ -54,18 +57,22 @@ process.on("uncaughtException", (err)=>{
 //signal termination sigterm
 process.on("SIGTERM", (err)=>{
     console.log("SIGTERM signal received ... Server is shutting down", err);
-    server.close(()=>{
-
+     if(server){
+        server.close(()=>{
+            process.exit(1)
     })
+    }
     process.exit(1)
 })
 
 //for manual shutdown
 process.on("SIGINT", (err)=>{
     console.log("SIGINT signal received ... Server is shutting down", err);
-    server.close(()=>{
-
+     if(server){
+        server.close(()=>{
+            process.exit(1)
     })
+    }
     process.exit(1)
 })
 
