@@ -7,7 +7,7 @@ export enum Role {
     DRIVER = "DRIVER"
 }
 export interface IAuthProvider {
-    provider: string;
+    provider: "google" | "credentials";
     providerId: string;
 }
 export enum isActive {
